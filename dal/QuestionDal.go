@@ -5,13 +5,13 @@ import "crud-mysql/models"
 //InsertQuestion to MathTestDB
 func InsertQuestion(question models.Question) (int64, int64, error) {
 	GetConnection()
-	sqlQuery := "INSERT Questions SET question=?, answer=?"
+	sqlQuery := "INSERT Questions SET difficulty=?, question=?, correct_answer=?"
 	stmt, err := db.Prepare(sqlQuery)
 	defer CloseStmt(stmt)
 	if err != nil {
 		return 0, 0, err
 	}
-	res, err := stmt.Exec(question.Question, question.Answer)
+	res, err := stmt.Exec(question.Difficulty, question.Question, question.CorrectAnswer)
 	if err != nil {
 		return 0, 0, err
 	}
@@ -19,20 +19,20 @@ func InsertQuestion(question models.Question) (int64, int64, error) {
 	if err != nil {
 		return 0, 0, err
 	}
-	lastInsertId, err := res.LastInsertId()
-	return rowsAffected, lastInsertId, err
+	lastInsertID, err := res.LastInsertId()
+	return rowsAffected, lastInsertID, err
 }
 
 //UpdateQuestion in MathTestDB
 func UpdateQuestion(question models.Question) (int64, error) {
 	GetConnection()
-	sqlQuery := "UPDATE Questions SET question=?, answer=? WHERE question_id = ?"
+	sqlQuery := "UPDATE Questions SET difficulty=?, question=?, correct_answer=? WHERE question_id = ?"
 	stmt, err := db.Prepare(sqlQuery)
 	defer CloseStmt(stmt)
 	if err != nil {
 		return 0, err
 	}
-	res, err := stmt.Exec(question.Question, question.Answer, question.QuestionId)
+	res, err := stmt.Exec(question.Difficulty, question.Question, question.CorrectAnswer, question.QuestionID)
 	if err != nil {
 		return 0, err
 	}
@@ -44,7 +44,7 @@ func UpdateQuestion(question models.Question) (int64, error) {
 }
 
 //DeleteQuestion in OrderDB
-func DeleteQuestion(questionId int64) (int64, error) {
+func DeleteQuestion(questionID int64) (int64, error) {
 	GetConnection()
 	sqlQuery := "DELETE FROM Questions WHERE question_id = ?"
 	stmt, err := db.Prepare(sqlQuery)
@@ -52,7 +52,7 @@ func DeleteQuestion(questionId int64) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	res, err := stmt.Exec(questionId)
+	res, err := stmt.Exec(questionID)
 	if err != nil {
 		return 0, err
 	}
@@ -64,29 +64,30 @@ func DeleteQuestion(questionId int64) (int64, error) {
 }
 
 //GetQuestion from questionId
-func GetQuestion(questionId int64) (models.Question, error) {
+func GetQuestion(questionID int64) (models.Question, error) {
 	GetConnection()
-	sqlQuery := "SELECT question_id, question, answer FROM Questions WHERE question_id = ?"
+	sqlQuery := "SELECT question_id, difficulty, question, correct_answer FROM Questions WHERE question_id = ?"
 	stmt, err := db.Prepare(sqlQuery)
 	defer CloseStmt(stmt)
 	var question models.Question
 	if err != nil {
 		return question, err
 	}
-	res, err := stmt.Query(questionId)
+	res, err := stmt.Query(questionID)
 	defer CloseRows(res)
 	if err != nil {
 		return question, err
 	}
 	if res.Next() {
-		res.Scan(&question.QuestionId, &question.Question, &question.Answer)
+		res.Scan(&question.QuestionID,  &question.Difficulty,  &question.Question, &question.CorrectAnswer)
 	}
 	return question, err
 }
 
+// GetAllQuestion select all dada from Questions table
 func GetAllQuestion() ([]models.Question, error) {
 	GetConnection()
-	sqlQuery := "SELECT * FROM Questions"
+	sqlQuery := "SELECT question_id, difficulty, question, correct_answer FROM Questions"
 	stmt, err := db.Prepare(sqlQuery)
 	defer CloseStmt(stmt)
 	var listQuestion = make([]models.Question, 0)
@@ -101,7 +102,7 @@ func GetAllQuestion() ([]models.Question, error) {
 	}
 	for res.Next() {
 		var question models.Question
-		res.Scan(&question.QuestionId, &question.Question, &question.Answer)
+		res.Scan(&question.QuestionID, &question.Difficulty, &question.Question, &question.CorrectAnswer)
 		listQuestion = append(listQuestion, question)
 	}
 

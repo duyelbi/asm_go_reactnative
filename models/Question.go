@@ -1,7 +1,9 @@
 package models
 
+// Question struct
 type Question struct {
-	QuestionId int64 `json:"questionId"`
+	QuestionID int64 `json:"questionId"`
+	Difficulty string `json:"difficulty"`
 	Question string `json:"question"`
-	Answer string `json:"answer"`
+	CorrectAnswer string `json:"correctAnswer"`
 }

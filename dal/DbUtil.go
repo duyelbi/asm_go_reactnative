@@ -12,7 +12,7 @@ var db *sql.DB
 
 // InitializeMySQL to MathTestDb
 func InitializeMySQL() {
-	dBConnection, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/MathTestDB")
+	dBConnection, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/quizdb")
 	if err != nil {
 		fmt.Println("Connetion Failed!!")
 	}
